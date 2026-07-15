@@ -1,0 +1,12 @@
+{
+  "name": "localhub-seoul",
+  "version": "1.0.0",
+  "description": "서울 지역 익명 커뮤니티 리디자인",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.4"
+  }
+}

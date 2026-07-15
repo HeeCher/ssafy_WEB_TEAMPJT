@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalHub - 서울 지역 전용 익명 커뮤니티</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            dark: '#0f172a',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+  <header class="fixed top-0 left-0 right-0 z-50 glass shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-3">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="bg-primary text-white p-2 rounded-xl shadow-md flex items-center justify-center">
+            <i class="ph-fill ph-buildings text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white leading-tight">LocalHub</h1>
+            <p class="text-xs text-slate-300 font-medium">서울 익명 커뮤니티</p>
+          </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a href="index.html" class="text-white border-b-2 border-primary pb-1">홈</a>
+          <a href="board.html" class="text-slate-300 hover:text-white transition-colors">게시판</a>
+          <a href="write.html" class="text-slate-300 hover:text-white transition-colors">글쓰기</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <button id="chatToggle" aria-label="챗봇 열기" class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm hover:bg-white/20 transition">AI 챗봇</button>
+          <button id="mobileMenuButton" aria-label="모바일 메뉴" class="md:hidden text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+            <i class="ph ph-list text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="mobileMenu" class="md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-white/10 px-4 py-4 hidden">
+      <div class="flex flex-col gap-3">
+        <a href="index.html" class="text-white font-semibold">홈</a>
+        <a href="board.html" class="text-slate-300 hover:text-white transition-colors">게시판</a>
+        <a href="write.html" class="bg-primary text-white px-4 py-2 rounded-full text-center font-medium">글쓰기</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow pt-20 pb-16">
+    <section class="relative bg-dark overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1538485395224-3298008efe3f?auto=format&fit=crop&w=1920&q=80" alt="Seoul Skyline" class="w-full h-full object-cover opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-transparent"></div>
+      </div>
+      <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-10">
+          <div class="max-w-2xl text-center sm:text-left">
+            <span class="inline-block py-1 px-3 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-sm font-semibold tracking-wider mb-4">SEOUL EXCLUSIVE</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">눈치 보지 말고 자유롭게,<br><span class="text-blue-400">서울의 진짜 이야기</span>를 나눠요.</h2>
+            <p class="text-slate-300 text-base sm:text-lg mb-8 max-w-xl mx-auto sm:mx-0">서울 시민과 여행객이 함께 만드는 익명 커뮤니티입니다. 숨은 맛집부터 오늘의 동네 소식까지 자유롭게 공유해 보세요.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
+              <a href="board.html" class="bg-white text-dark px-6 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">익명 게시판 입장하기 <i class="ph ph-arrow-right"></i></a>
+              <a href="write.html" class="bg-secondary text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:bg-emerald-500 transition duration-300 flex items-center justify-center gap-2">글쓰기 시작하기 <i class="ph ph-pencil-simple"></i></a>
+            </div>
+          </div>
+          <div class="hidden lg:block bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-3xl text-white w-full max-w-[340px]">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="bg-white/20 p-3 rounded-full"><i class="ph-fill ph-users text-2xl"></i></div>
+              <div>
+                <p class="text-sm text-slate-300">현재 접속자</p>
+                <p class="text-2xl font-bold">1,248 명</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="bg-white/20 p-3 rounded-full"><i class="ph-fill ph-chat-teardrop-text text-2xl"></i></div>
+              <div>
+                <p class="text-sm text-slate-300">오늘 올라온 글</p>
+                <p class="text-2xl font-bold">342 개</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 space-y-12">
+      <section class="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+        <div id="weatherCard" class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-4">
+            <div class="text-blue-500 text-5xl"><i class="ph-fill ph-sun"></i></div>
+            <div>
+              <h3 id="weatherTitle" class="text-xl font-bold text-slate-800">서울, 로딩 중...</h3>
+              <p id="weatherDetail" class="text-slate-500 text-sm">현재 날씨를 불러오는 중입니다.</p>
+            </div>
+          </div>
+          <div class="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
+            <div class="bg-green-100 text-green-600 p-2 rounded-full"><i class="ph-fill ph-check-circle text-lg"></i></div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">여행 적합도</p>
+              <p id="weatherTag" class="font-bold text-green-600">서울 현황을 확인해 보세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-end mb-4 gap-4">
+            <div>
+              <h4 class="font-bold text-lg text-slate-800">🌤️ 서울 날씨에 어울리는 가볼만한곳</h4>
+              <p class="text-sm text-slate-500">서울 데이터를 활용한 추천 스팟입니다.</p>
+            </div>
+            <a href="board.html?category=가볼만한곳" class="text-sm text-slate-500 hover:text-primary flex items-center gap-1">더 보기 <i class="ph ph-caret-right"></i></a>
+          </div>
+          <div id="spotList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h3 class="text-2xl font-bold text-slate-800">🔥 실시간 인기 게시글</h3>
+            <p class="text-slate-500 text-sm mt-1">인기 기준으로 정렬된 최신 게시글을 확인하세요.</p>
+          </div>
+          <a href="board.html" class="text-sm font-medium text-slate-500 hover:text-primary flex items-center gap-1">게시판 전체보기 <i class="ph ph-caret-right"></i></a>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <a href="post.html?id=1" class="block rounded-3xl border border-slate-100 bg-slate-50 p-5 shadow-sm hover:shadow-2xl transition">
+            <div class="flex justify-between items-start mb-3">
+              <span class="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded-md">맛집탐방</span>
+              <span class="text-xs text-slate-400">10분 전</span>
+            </div>
+            <h4 class="font-bold text-lg text-slate-900 mb-2">신당동 떡볶이 타운 숨은 맛집 찾았음!!</h4>
+            <p class="text-slate-500 text-sm line-clamp-2">골목 안쪽 작은 가게에서 인생 떡볶이를 발견했습니다. 야끼만두도 강추해요.</p>
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>익명 124</span>
+              <span class="flex items-center gap-1"><i class="ph-fill ph-heart text-red-500"></i> 24</span>
+            </div>
+          </a>
+          <a href="post.html?id=3" class="block rounded-3xl border border-slate-100 bg-slate-50 p-5 shadow-sm hover:shadow-2xl transition">
+            <div class="flex justify-between items-start mb-3">
+              <span class="bg-purple-100 text-purple-600 text-xs font-bold px-2 py-1 rounded-md">축제/행사</span>
+              <span class="text-xs text-slate-400">2시간 전</span>
+            </div>
+            <h4 class="font-bold text-lg text-slate-900 mb-2">이번주 광화문 야시장 오픈! 🌃</h4>
+            <p class="text-slate-500 text-sm line-clamp-2">금토일 18시부터 야시장 오픈. 푸드트럭과 분위기까지 즐길 수 있어요.</p>
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>익명 412</span>
+              <span class="flex items-center gap-1"><i class="ph-fill ph-heart text-red-500"></i> 89</span>
+            </div>
+          </a>
+          <a href="post.html?id=2" class="block rounded-3xl border border-slate-100 bg-slate-50 p-5 shadow-sm hover:shadow-2xl transition">
+            <div class="flex justify-between items-start mb-3">
+              <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded-md">동네질문</span>
+              <span class="text-xs text-slate-400">45분 전</span>
+            </div>
+            <h4 class="font-bold text-lg text-slate-900 mb-2">마포구쪽 야간 러닝 코스 추천좀요</h4>
+            <p class="text-slate-500 text-sm line-clamp-2">한강 말고 가로등 밝고 적당히 사람이 있는 야간 러닝 코스를 찾고 있어요.</p>
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>익명 89</span>
+              <span class="flex items-center gap-1"><i class="ph ph-heart"></i> 2</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <i class="ph-fill ph-buildings text-slate-400 text-xl"></i>
+        <span class="font-bold text-slate-600">LocalHub</span>
+      </div>
+      <p class="text-slate-400 text-sm text-center md:text-left">본 사이트는 교육용 프로젝트 산출물입니다. 제공되는 공공데이터에 기반합니다.</p>
+      <div class="flex gap-4 text-slate-400">
+        <a href="#" class="hover:text-slate-600" aria-label="GitHub 링크"><i class="ph-fill ph-github-logo text-2xl"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="chatbotWindow" class="fixed bottom-6 right-6 w-[320px] max-w-full bg-white border border-slate-200 rounded-3xl shadow-2xl p-4 transition duration-300 scale-95 opacity-0 pointer-events-none">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">AI 챗봇</h3>
+        <p class="text-xs text-slate-500">서울 관련 질문을 해보세요.</p>
+      </div>
+      <button onclick="toggleChatbot()" class="text-slate-400 hover:text-slate-700"><i class="ph ph-x text-xl"></i></button>
+    </div>
+    <div id="chatHistory" class="flex flex-col gap-3 max-h-72 overflow-y-auto pb-2"></div>
+    <form id="chatForm" class="mt-3 flex gap-2">
+      <input id="chatInput" type="text" placeholder="예: 서울 가볼만한곳 추천" class="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button type="submit" class="bg-primary text-white rounded-2xl px-4 py-3 text-sm">전송</button>
+    </form>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col gap-3 items-center z-50"></div>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/index.js"></script>
+</body>
+</html>
