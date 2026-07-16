@@ -28,18 +28,27 @@ function toggleChatbot() {
     chatbot.classList.toggle('pointer-events-none', !isChatOpen);
 }
 
-function getChatAnswer(message) {
-    const text = message.toLowerCase();
-    if (text.includes('날씨') || text.includes('기온') || text.includes('서울 날씨')) {
-        return '서울 날씨는 메인에서 현재 정보로 확인할 수 있어요. 오늘은 맑은 날씨라면 한강 산책도 추천합니다.';
+async function getChatAnswer(message) {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ question: message }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => null);
+            const detail = error?.details ? ` (${error.details})` : '';
+            return `${error?.error || 'AI 응답을 가져오는 중 문제가 발생했습니다.'}${detail}`;
+        }
+
+        const data = await response.json();
+        return data.answer || 'AI 응답이 비어 있습니다. 다시 시도해 주세요.';
+    } catch (error) {
+        return '서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';
     }
-    if (text.includes('가볼만한곳') || text.includes('추천') || text.includes('여행')) {
-        return '서울 가볼만한 곳은 서울숲, 양화한강공원, 북촌 8경 등이 있어요. 게시판의 "가볼만한곳" 카테고리에서도 더 많은 추천을 볼 수 있습니다.';
-    }
-    if (text.includes('게시글') || text.includes('글쓰기') || text.includes('작성')) {
-        return '게시글 작성은 상단의 글쓰기 버튼을 눌러 새로운 글을 등록하고, 등록 후 상세 페이지로 바로 이동할 수 있습니다.';
-    }
-    return '궁금한 내용을 입력해 주세요. 예: "서울 가볼만한곳 추천", "오늘 날씨", "글쓰기 방법"';
 }
 
 function appendChatMessage(text, source) {
@@ -54,7 +63,7 @@ function appendChatMessage(text, source) {
     history.scrollTop = history.scrollHeight;
 }
 
-function handleChatSubmit(event) {
+async function handleChatSubmit(event) {
     event.preventDefault();
     const input = document.getElementById('chatInput');
     if (!input) return;
@@ -62,8 +71,15 @@ function handleChatSubmit(event) {
     if (!message) return;
     appendChatMessage(message, 'user');
     input.value = '';
-    const answer = getChatAnswer(message);
-    setTimeout(() => appendChatMessage(answer, 'bot'), 250);
+    appendChatMessage('AI가 응답 중입니다...', 'bot');
+
+    const answer = await getChatAnswer(message);
+    const history = document.getElementById('chatHistory');
+    if (history && history.lastChild) {
+        history.removeChild(history.lastChild);
+    }
+
+    appendChatMessage(answer, 'bot');
 }
 
 function toggleMobileMenu() {
