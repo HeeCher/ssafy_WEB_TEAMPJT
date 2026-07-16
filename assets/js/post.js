@@ -7,6 +7,7 @@ const likeCount = document.getElementById('likeCount');
 const viewCount = document.getElementById('viewCount');
 const shareButton = document.getElementById('shareButton');
 const kakaoButton = document.getElementById('kakaoButton');
+const editButton = document.getElementById('editButton');
 
 async function fetchPost() {
   if (!postId) {
@@ -54,6 +55,11 @@ async function copyLink() {
   }
 }
 
+function goToEdit() {
+  if (!postId) return;
+  window.location.href = `write.html?id=${postId}`;
+}
+
 function kakaoPlaceholder() {
   showToast('카카오톡 공유는 추후에 추가될 예정입니다.');
 }
@@ -63,4 +69,5 @@ window.addEventListener('DOMContentLoaded', () => {
   if (likeButton) likeButton.addEventListener('click', likePost);
   if (shareButton) shareButton.addEventListener('click', copyLink);
   if (kakaoButton) kakaoButton.addEventListener('click', kakaoPlaceholder);
+  if (editButton) editButton.addEventListener('click', goToEdit);
 });

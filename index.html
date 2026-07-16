@@ -43,7 +43,7 @@
         <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="index.html" class="text-white border-b-2 border-primary pb-1">홈</a>
           <a href="board.html" class="text-slate-300 hover:text-white transition-colors">게시판</a>
-          <a href="write.html" class="text-slate-300 hover:text-white transition-colors">글쓰기</a>
+          <a href="spot.html" class="text-slate-300 hover:text-white transition-colors">가볼만한곳 추천</a>
         </nav>
         <div class="flex items-center gap-3">
           <button id="chatToggle" aria-label="챗봇 열기" class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm hover:bg-white/20 transition">AI 챗봇</button>
@@ -57,7 +57,7 @@
       <div class="flex flex-col gap-3">
         <a href="index.html" class="text-white font-semibold">홈</a>
         <a href="board.html" class="text-slate-300 hover:text-white transition-colors">게시판</a>
-        <a href="write.html" class="bg-primary text-white px-4 py-2 rounded-full text-center font-medium">글쓰기</a>
+        <a href="spot.html" class="bg-primary text-white px-4 py-2 rounded-full text-center font-medium">가볼만한곳 추천</a>
       </div>
     </div>
   </header>
@@ -99,7 +99,7 @@
       </div>
     </section>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 space-y-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-12">
       <section class="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
         <div id="weatherCard" class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-4">
@@ -123,7 +123,7 @@
               <h4 class="font-bold text-lg text-slate-800">🌤️ 서울 날씨에 어울리는 가볼만한곳</h4>
               <p class="text-sm text-slate-500">서울 데이터를 활용한 추천 스팟입니다.</p>
             </div>
-            <a href="board.html?category=가볼만한곳" class="text-sm text-slate-500 hover:text-primary flex items-center gap-1">더 보기 <i class="ph ph-caret-right"></i></a>
+            <a href="spot.html" class="text-sm text-slate-500 hover:text-primary flex items-center gap-1">더 보기 <i class="ph ph-caret-right"></i></a>
           </div>
           <div id="spotList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </div>
