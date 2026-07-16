@@ -218,14 +218,128 @@ app.get('/api/seoul-spots', async (req, res) => {
   res.json(picks);
 });
 
+app.get('/api/seoul-spots/:id', async (req, res) => {
+  const spotsData = await readJson(SPOTS_FILE);
+  if (!spotsData || !Array.isArray(spotsData.items)) {
+    return res.status(500).json({ error: '서울 데이터 로드에 실패했습니다.' });
+  }
+
+  const spot = spotsData.items.find(item => item.contentid === req.params.id);
+  if (!spot) {
+    return res.status(404).json({ error: '스팟을 찾을 수 없습니다.' });
+  }
+
+  const photos = [spot.firstimage, spot.firstimage2, spot.firstimage]
+    .filter(Boolean)
+    .slice(0, 3);
+
+  while (photos.length < 3) {
+    photos.push(photos[0] || 'https://via.placeholder.com/800x500?text=No+Image');
+  }
+
+  const locationInfo = [
+    {
+      key: '강동구',
+      stations: [
+        { name: '둔촌오륜역', line: '5호선', distance: '1.1km' },
+        { name: '강동역', line: '5호선', distance: '1.4km' }
+      ],
+      restaurants: [
+  {
+    name: '둔촌역 감자탕',
+    desc: '든든한 한식 국물 맛집',
+    photo: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+    naverLink: 'https://search.naver.com/search.naver?query=둔촌역+감자탕',
+    reviews: '3,200'
+  },
+  {
+    name: '강동역 카페 75',
+    desc: '브런치와 디저트 추천',
+    photo: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=80',
+    naverLink: 'https://search.naver.com/search.naver?query=강동역+카페+75',
+    reviews: '2,100'
+  },
+  {
+    name: '둔촌역 분식',
+    desc: '가성비 떡볶이 전문점',
+    photo: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=800&q=80',
+    naverLink: 'https://search.naver.com/search.naver?query=둔촌역+분식',
+    reviews: '1,870'
+  }
+]
+    },
+    {
+      key: '종로구',
+      stations: [
+        { name: '종각역', line: '1호선', distance: '900m' },
+        { name: '안국역', line: '3호선', distance: '1.3km' }
+      ],
+      restaurants: [
+        { name: '종각 떡볶이', desc: '매콤달콤 즉석 떡볶이' },
+        { name: '광화문 김밥', desc: '간편하고 인기 많은 분식집' },
+        { name: '인사동 찻집', desc: '전통 다과와 분위기 좋은 카페' }
+      ]
+    },
+    {
+      key: '성동구',
+      stations: [
+        { name: '뚝섬역', line: '2호선', distance: '750m' },
+        { name: '성수역', line: '2호선', distance: '1.8km' }
+      ],
+      restaurants: [
+        { name: '뚝섬 파스타', desc: '데이트하기 좋은 이탈리안' },
+        { name: '서울숲 분식', desc: '가볍게 즐기는 한끼' },
+        { name: '카페 포레스트', desc: '도심 속 힐링 카페' }
+      ]
+    }
+  ];
+
+  const matched = locationInfo.find(item => spot.addr1.includes(item.key));
+  const nearbyStations = matched?.stations || [
+    { name: '서울역', line: '1호선', distance: '2.0km' }
+  ];
+  const nearbyRestaurants = matched?.restaurants || [
+    { name: '서울 맛집 A', desc: '대표 추천 맛집입니다.' },
+    { name: '서울 맛집 B', desc: '인기 메뉴를 경험해보세요.' },
+    { name: '서울 맛집 C', desc: '가볍게 들르기 좋은 식당.' }
+  ];
+
+  res.json({
+    id: spot.contentid,
+    title: spot.title,
+    address: spot.addr1,
+    category: spot.cat3 || spot.cat2 || spot.cat1 || '서울 가볼만한곳',
+    tel: spot.tel || '정보 없음',
+    photos,
+    mapx: spot.mapx,
+    mapy: spot.mapy,
+    features: [
+      `${spot.title}은(는) ${spot.addr1}에 위치한 인기 명소입니다.`,
+      '사진 찍기 좋은 포토 스팟과 산책로가 잘 조성되어 있습니다.',
+      '가족 나들이, 연인 데이트, 친구들과 함께하기 좋은 장소입니다.'
+    ],
+    nearbyStations,
+    nearbyRestaurants
+  });
+});
+
 app.get('/api/weather', async (req, res) => {
   try {
     const url = 'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current_weather=true&timezone=Asia/Seoul';
     const response = await fetch(url);
-    const data = await response.json();
-    if (!data.current_weather) {
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Weather API response error:', response.status, errorText);
       return res.status(502).json({ error: '기상 정보를 가져오는 데 실패했습니다.' });
     }
+
+    const data = await response.json();
+    if (!data?.current_weather) {
+      console.error('Weather API returned invalid data:', data);
+      return res.status(502).json({ error: '기상 정보를 가져오는 데 실패했습니다.' });
+    }
+
     res.json({
       city: '서울',
       temperature: data.current_weather.temperature,
@@ -235,6 +349,7 @@ app.get('/api/weather', async (req, res) => {
       summary: weatherDescription(data.current_weather.weathercode)
     });
   } catch (error) {
+    console.error('Weather API 호출 중 오류:', error);
     res.status(500).json({ error: '기상 API 호출 중 오류가 발생했습니다.' });
   }
 });

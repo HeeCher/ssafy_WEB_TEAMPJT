@@ -76,11 +76,53 @@ async function loadSpot() {
     </div>
   `);
 
-  renderList(restaurantList, spot.nearbyRestaurants, resto => `
-    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-      <h3 class="font-semibold text-slate-900">${resto.name}</h3>
-      <p class="text-slate-500 text-sm">${resto.desc}</p>
-    </div>
+  const restaurantTypes = [
+    {
+      label: '주변 한식',
+      query: '한식',
+      photo: 'assets/images/hansik.png',
+      desc: '비빔밥, 된장찌개 등 한식 맛집 검색'
+    },
+    {
+      label: '주변 양식',
+      query: '양식',
+      photo: 'assets/images/pasta.png',
+      desc: '파스타, 스테이크 등 양식 맛집 검색'
+    },
+    {
+      label: '주변 일식',
+      query: '일식',
+      photo: 'assets/images/sushi.png',
+      desc: '스시 등 일식 맛집 검색'
+    }
+  ];
+
+  const restaurantSearchItems = restaurantTypes.map(type => {
+    const keyword = `${spot.address} 주변 ${type.query}`;
+    return {
+      name: type.label,
+      desc: `${spot.address} 주변 ${type.query} 맛집 검색`,
+      photo: type.photo,
+      naverLink: `https://search.naver.com/search.naver?query=${encodeURIComponent(keyword)}`
+    };
+  });
+
+  renderList(restaurantList, restaurantSearchItems, resto => `
+    <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <img src="${resto.photo}"
+           alt="${resto.name} 대표 이미지"
+           class="w-full h-44 object-cover">
+      <div class="p-4">
+        <h3 class="font-semibold text-slate-900 mb-2">${resto.name}</h3>
+        <p class="text-slate-500 text-sm mb-3">${resto.desc}</p>
+        <a href="${resto.naverLink}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="inline-flex items-center justify-center w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-blue-600 transition">
+          네이버에서 보기
+        </a>
+      </div>
+    </article>
   `);
 
   const mapx = encodeURIComponent(spot.mapx);
