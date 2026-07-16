@@ -15,6 +15,10 @@ function showToast(message) {
 }
 
 let isChatOpen = false;
+let isDragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
 function toggleChatbot() {
     const chatbot = document.getElementById('chatbotWindow');
     if (!chatbot) return;
@@ -68,11 +72,56 @@ function toggleMobileMenu() {
     menu.classList.toggle('hidden');
 }
 
+function onChatbotDragStart(event) {
+    const chatbot = document.getElementById('chatbotWindow');
+    if (!chatbot) return;
+
+    event.preventDefault();
+    isDragging = true;
+
+    const rect = chatbot.getBoundingClientRect();
+    dragOffsetX = event.clientX - rect.left;
+    dragOffsetY = event.clientY - rect.top;
+
+    chatbot.style.right = 'auto';
+    chatbot.style.bottom = 'auto';
+    chatbot.style.zIndex = '9999';
+
+    window.addEventListener('pointermove', onChatbotDragMove);
+    window.addEventListener('pointerup', onChatbotDragEnd, { once: true });
+}
+
+function onChatbotDragMove(event) {
+    if (!isDragging) return;
+
+    const chatbot = document.getElementById('chatbotWindow');
+    if (!chatbot) return;
+
+    const x = event.clientX - dragOffsetX;
+    const y = event.clientY - dragOffsetY;
+
+    const maxX = window.innerWidth - chatbot.offsetWidth;
+    const maxY = window.innerHeight - chatbot.offsetHeight;
+
+    chatbot.style.left = `${Math.min(Math.max(0, x), maxX)}px`;
+    chatbot.style.top = `${Math.min(Math.max(0, y), maxY)}px`;
+}
+
+function onChatbotDragEnd() {
+    isDragging = false;
+    window.removeEventListener('pointermove', onChatbotDragMove);
+}
+
 function initialize() {
     const mobileButton = document.getElementById('mobileMenuButton');
     if (mobileButton) mobileButton.addEventListener('click', toggleMobileMenu);
+
     const chatOpen = document.getElementById('chatToggle');
     if (chatOpen) chatOpen.addEventListener('click', toggleChatbot);
+
+    const chatHandle = document.getElementById('chatbotHandle');
+    if (chatHandle) chatHandle.addEventListener('pointerdown', onChatbotDragStart);
+
     const chatForm = document.getElementById('chatForm');
     if (chatForm) chatForm.addEventListener('submit', handleChatSubmit);
 }
