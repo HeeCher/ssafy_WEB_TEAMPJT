@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
 const SPOTS_FILE = path.join(__dirname, 'data', 'seoul_spots.json');
 
@@ -62,8 +62,18 @@ const seedDb = {
   posts: seedPosts
 };
 
-async function readJson(filePath) { ... }
-async function writeJson(filePath, data) { ... }
+async function readJson(filePath) {
+  try {
+    const text = await fs.promises.readFile(filePath, 'utf8');
+    return JSON.parse(text);
+  } catch (error) {
+    return null;
+  }
+}
+
+async function writeJson(filePath, data) {
+  await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
 
 app.put('/api/posts/:id', async (req, res) => {
   const db = await ensureDb();
