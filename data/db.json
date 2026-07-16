@@ -1,6 +1,48 @@
 {
-  "nextId": 7,
+  "nextId": 10,
   "posts": [
+    {
+      "id": 9,
+      "title": "삭제테스트",
+      "category": "맛집탐방",
+      "content": "삭제",
+      "excerpt": "삭제",
+      "author": "익명",
+      "createdAt": "2026-07-16T02:43:51.766Z",
+      "likes": 4,
+      "views": 8,
+      "tags": [
+        "삭제"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "ㅁㄴㅇㄹ",
+      "category": "맛집탐방",
+      "content": "ㅁㄴㄹㅇ",
+      "excerpt": "ㅁㄴㄹㅇ",
+      "author": "익명",
+      "createdAt": "2026-07-16T02:27:14.823Z",
+      "likes": 0,
+      "views": 5,
+      "tags": [
+        "ㅁㄹ"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "테스트 123",
+      "category": "맛집탐방",
+      "content": "역삼동 근처 맛집을 추천드립니다.",
+      "excerpt": "역삼동 근처 맛집을 추천드립니다.",
+      "author": "익명",
+      "createdAt": "2026-07-16T02:17:47.706Z",
+      "likes": 0,
+      "views": 7,
+      "tags": [
+        "맛집"
+      ]
+    },
     {
       "id": 6,
       "title": "테스트입니다.",
@@ -10,7 +52,7 @@
       "author": "익명",
       "createdAt": "2026-07-16T01:06:49.410Z",
       "likes": 0,
-      "views": 3,
+      "views": 7,
       "tags": [
         "테스트"
       ]
@@ -53,7 +95,7 @@
       "author": "익명 89",
       "createdAt": "2026-07-15T09:20:00.000Z",
       "likes": 7,
-      "views": 87,
+      "views": 88,
       "tags": [
         "러닝",
         "야간"
@@ -68,7 +110,7 @@
       "author": "익명 412",
       "createdAt": "2026-07-15T08:10:00.000Z",
       "likes": 93,
-      "views": 247,
+      "views": 254,
       "tags": [
         "야시장",
         "축제"

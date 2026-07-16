@@ -172,7 +172,6 @@ app.post('/api/posts', async (req, res) => {
   if (!title || !content || !password) {
     return res.status(400).json({ error: '제목, 내용, 비밀번호는 필수입니다.' });
   }
-
   const newPost = {
     id: db.nextId++,
     title: title.toString().trim(),
@@ -290,6 +289,30 @@ app.get('/api/weather', async (req, res) => {
   }
 });
 
+app.delete('/api/posts/:id', async (req, res) => {
+  const db = await ensureDb();
+  const postIndex = db.posts.findIndex(p => p.id === Number(req.params.id));
+
+  if (postIndex === -1) {
+    return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+  }
+
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: '비밀번호는 필수입니다.' });
+  }
+
+  const post = db.posts[postIndex];
+  if (hashPassword(password) !== post.passwordHash) {
+    return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
+  }
+
+  db.posts.splice(postIndex, 1);
+  await writeJson(DB_FILE, db);
+  res.json({ success: true });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
