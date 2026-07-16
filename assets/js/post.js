@@ -57,11 +57,46 @@ async function copyLink() {
 
 function goToEdit() {
   if (!postId) return;
+
+  const password = prompt('수정 비밀번호를 입력하세요.');
+  if (!password) return;
+
+  sessionStorage.setItem('editPassword', password);
   window.location.href = `write.html?id=${postId}`;
 }
 
 function kakaoPlaceholder() {
   showToast('카카오톡 공유는 추후에 추가될 예정입니다.');
+}
+
+const deleteButton = document.getElementById('deleteButton');
+
+async function deletePost() {
+  if (!postId) return;
+  const password = prompt('삭제 비밀번호를 입력하세요.');
+  if (!password) return;
+
+  const confirmed = confirm('정말 이 게시글을 삭제하시겠습니까?');
+  if (!confirmed) return;
+
+  const response = await fetch(`/api/posts/${postId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    if (response.status === 403) {
+      showToast('비밀번호가 일치하지 않습니다.');
+    } else {
+      showToast(error.error || '삭제에 실패했습니다.');
+    }
+    return;
+  }
+
+  showToast('게시글이 삭제되었습니다.');
+  window.location.href = 'board.html';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -70,4 +105,5 @@ window.addEventListener('DOMContentLoaded', () => {
   if (shareButton) shareButton.addEventListener('click', copyLink);
   if (kakaoButton) kakaoButton.addEventListener('click', kakaoPlaceholder);
   if (editButton) editButton.addEventListener('click', goToEdit);
+  if (deleteButton) deleteButton.addEventListener('click', deletePost);
 });

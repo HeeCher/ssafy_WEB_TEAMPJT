@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
@@ -17,7 +18,8 @@ const seedPosts = [
     createdAt: '2026-07-15T10:05:00.000Z',
     likes: 24,
     views: 120,
-    tags: ['맛집', '떡볶이']
+    tags: ['맛집', '떡볶이'],
+    passwordHash: crypto.createHash('sha256').update('1234').digest('hex')
   },
   {
     id: 2,
@@ -29,7 +31,8 @@ const seedPosts = [
     createdAt: '2026-07-15T09:20:00.000Z',
     likes: 2,
     views: 82,
-    tags: ['러닝', '야간']
+    tags: ['러닝', '야간'],
+    passwordHash: crypto.createHash('sha256').update('1234').digest('hex')
   },
   {
     id: 3,
@@ -41,7 +44,8 @@ const seedPosts = [
     createdAt: '2026-07-15T08:10:00.000Z',
     likes: 89,
     views: 230,
-    tags: ['야시장', '축제']
+    tags: ['야시장', '축제'],
+    passwordHash: crypto.createHash('sha256').update('1234').digest('hex')
   },
   {
     id: 4,
@@ -53,53 +57,27 @@ const seedPosts = [
     createdAt: '2026-07-14T22:05:00.000Z',
     likes: 56,
     views: 164,
-    tags: ['가을', '나들이']
+    tags: ['가을', '나들이'],
+    passwordHash: crypto.createHash('sha256').update('1234').digest('hex')
   }
 ];
+
+
 
 const seedDb = {
   nextId: 5,
   posts: seedPosts
 };
 
-async function readJson(filePath) {
-  try {
-    const text = await fs.promises.readFile(filePath, 'utf8');
-    return JSON.parse(text);
-  } catch (error) {
-    return null;
-  }
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password.toString()).digest('hex');
 }
 
-async function writeJson(filePath, data) {
-  await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+function sanitizePost(post) {
+  const safePost = { ...post };
+  delete safePost.passwordHash;
+  return safePost;
 }
-
-app.put('/api/posts/:id', async (req, res) => {
-  const db = await ensureDb();
-  const post = db.posts.find(p => p.id === Number(req.params.id));
-  if (!post) {
-    return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
-  }
-
-  const { title, category, content, tags } = req.body;
-  if (!title || !content) {
-    return res.status(400).json({ error: '제목과 내용은 필수입니다.' });
-  }
-
-  post.title = title.toString().trim();
-  post.category = category ? category.toString().trim() : post.category;
-  post.content = content.toString().trim();
-  post.excerpt = content.toString().trim().slice(0, 160);
-  post.tags = Array.isArray(tags)
-    ? tags.map(tag => tag.toString().trim()).filter(Boolean)
-    : typeof tags === 'string' && tags.length
-      ? tags.split(',').map(tag => tag.trim()).filter(Boolean)
-      : post.tags;
-
-  await writeJson(DB_FILE, db);
-  res.json(post);
-});
 
 async function readJson(filePath) {
   try {
@@ -175,7 +153,7 @@ app.get('/api/posts', async (req, res) => {
   }
 
   posts.sort((a, b) => b.likes - a.likes || b.views - a.views);
-  res.json(posts);
+  res.json(posts.map(sanitizePost));
 });
 
 app.get('/api/posts/:id', async (req, res) => {
@@ -184,14 +162,15 @@ app.get('/api/posts/:id', async (req, res) => {
   if (!post) {
     return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
   }
-  res.json(post);
+  res.json(sanitizePost(post));
 });
 
 app.post('/api/posts', async (req, res) => {
   const db = await ensureDb();
-  const { title, category, content, tags } = req.body;
-  if (!title || !content) {
-    return res.status(400).json({ error: '제목과 내용은 필수입니다.' });
+  const { title, category, content, tags, password } = req.body;
+
+  if (!title || !content || !password) {
+    return res.status(400).json({ error: '제목, 내용, 비밀번호는 필수입니다.' });
   }
   const newPost = {
     id: db.nextId++,
@@ -203,6 +182,7 @@ app.post('/api/posts', async (req, res) => {
     createdAt: new Date().toISOString(),
     likes: 0,
     views: 0,
+    passwordHash: hashPassword(password),
     tags: Array.isArray(tags)
       ? tags.map(tag => tag.toString().trim()).filter(Boolean)
       : typeof tags === 'string' && tags.length
@@ -212,7 +192,38 @@ app.post('/api/posts', async (req, res) => {
 
   db.posts.unshift(newPost);
   await writeJson(DB_FILE, db);
-  res.status(201).json(newPost);
+  res.status(201).json(sanitizePost(newPost));
+});
+
+app.put('/api/posts/:id', async (req, res) => {
+  const db = await ensureDb();
+  const post = db.posts.find(p => p.id === Number(req.params.id));
+
+  if (!post) {
+    return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+  }
+
+  const { title, category, content, tags, password } = req.body;
+  if (!title || !content || !password) {
+    return res.status(400).json({ error: '제목, 내용, 비밀번호는 필수입니다.' });
+  }
+
+  if (hashPassword(password) !== post.passwordHash) {
+    return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
+  }
+
+  post.title = title.toString().trim();
+  post.category = category ? category.toString().trim() : post.category;
+  post.content = content.toString().trim();
+  post.excerpt = content.toString().trim().slice(0, 160);
+  post.tags = Array.isArray(tags)
+    ? tags.map(tag => tag.toString().trim()).filter(Boolean)
+    : typeof tags === 'string' && tags.length
+      ? tags.split(',').map(tag => tag.trim()).filter(Boolean)
+      : post.tags;
+
+  await writeJson(DB_FILE, db);
+  res.json(sanitizePost(post));
 });
 
 app.post('/api/posts/:id/like', async (req, res) => {
@@ -278,6 +289,30 @@ app.get('/api/weather', async (req, res) => {
   }
 });
 
+app.delete('/api/posts/:id', async (req, res) => {
+  const db = await ensureDb();
+  const postIndex = db.posts.findIndex(p => p.id === Number(req.params.id));
+
+  if (postIndex === -1) {
+    return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+  }
+
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: '비밀번호는 필수입니다.' });
+  }
+
+  const post = db.posts[postIndex];
+  if (hashPassword(password) !== post.passwordHash) {
+    return res.status(403).json({ error: '비밀번호가 일치하지 않습니다.' });
+  }
+
+  db.posts.splice(postIndex, 1);
+  await writeJson(DB_FILE, db);
+  res.json({ success: true });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+

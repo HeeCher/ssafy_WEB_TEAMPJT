@@ -2,6 +2,7 @@ const writeForm = document.getElementById('writeForm');
 const postId = new URLSearchParams(window.location.search).get('id');
 const pageTitle = document.getElementById('pageTitle');
 const submitButton = document.getElementById('submitButton');
+const pageDescription = document.getElementById('pageDescription');
 
 async function loadPostForEdit() {
   if (!postId) return;
@@ -12,7 +13,15 @@ async function loadPostForEdit() {
   writeForm.category.value = post.category;
   writeForm.tags.value = post.tags.join(', ');
   writeForm.content.value = post.content;
+
+  const savedPassword = sessionStorage.getItem('editPassword');
+  if (savedPassword) {
+    writeForm.password.value = savedPassword;
+    sessionStorage.removeItem('editPassword');
+  }
+
   if (pageTitle) pageTitle.textContent = '게시글 수정';
+  if (pageDescription) pageDescription.textContent = '비밀번호를 입력하고 수정하기를 눌러주세요.';
   if (submitButton) submitButton.textContent = '수정하기';
 }
 
@@ -23,9 +32,10 @@ async function submitPost(event) {
   const category = formData.get('category').toString();
   const tags = formData.get('tags').toString();
   const content = formData.get('content').toString().trim();
+  const password = formData.get('password').toString().trim();
 
-  if (!title || !content) {
-    showToast('제목과 내용은 모두 입력해주세요.');
+  if (!title || !content || !password) {
+    showToast('제목, 내용, 비밀번호는 모두 입력해주세요.');
     return;
   }
 
@@ -35,14 +45,18 @@ async function submitPost(event) {
   const response = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, category, tags, content })
+    body: JSON.stringify({ title, category, tags, content, password })
   });
 
   if (!response.ok) {
-    const error = await response.json();
+  const error = await response.json();
+  if (response.status === 403) {
+    showToast('비밀번호가 일치하지 않습니다.');
+  } else {
     showToast(error.error || '게시글 저장에 실패했습니다.');
-    return;
   }
+  return;
+}
 
   const post = await response.json();
   showToast(postId ? '게시글이 수정되었습니다.' : '게시글이 등록되었습니다.');
