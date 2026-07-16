@@ -23,9 +23,10 @@ async function submitPost(event) {
   const category = formData.get('category').toString();
   const tags = formData.get('tags').toString();
   const content = formData.get('content').toString().trim();
+  const password = formData.get('password').toString().trim();
 
-  if (!title || !content) {
-    showToast('제목과 내용은 모두 입력해주세요.');
+  if (!title || !content || !password) {
+    showToast('제목, 내용, 비밀번호는 모두 입력해주세요.');
     return;
   }
 
@@ -35,7 +36,7 @@ async function submitPost(event) {
   const response = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, category, tags, content })
+    body: JSON.stringify({ title, category, tags, content, password })
   });
 
   if (!response.ok) {
