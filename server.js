@@ -62,6 +62,35 @@ const seedDb = {
   posts: seedPosts
 };
 
+async function readJson(filePath) { ... }
+async function writeJson(filePath, data) { ... }
+
+app.put('/api/posts/:id', async (req, res) => {
+  const db = await ensureDb();
+  const post = db.posts.find(p => p.id === Number(req.params.id));
+  if (!post) {
+    return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+  }
+
+  const { title, category, content, tags } = req.body;
+  if (!title || !content) {
+    return res.status(400).json({ error: '제목과 내용은 필수입니다.' });
+  }
+
+  post.title = title.toString().trim();
+  post.category = category ? category.toString().trim() : post.category;
+  post.content = content.toString().trim();
+  post.excerpt = content.toString().trim().slice(0, 160);
+  post.tags = Array.isArray(tags)
+    ? tags.map(tag => tag.toString().trim()).filter(Boolean)
+    : typeof tags === 'string' && tags.length
+      ? tags.split(',').map(tag => tag.trim()).filter(Boolean)
+      : post.tags;
+
+  await writeJson(DB_FILE, db);
+  res.json(post);
+});
+
 async function readJson(filePath) {
   try {
     const text = await fs.promises.readFile(filePath, 'utf8');

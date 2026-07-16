@@ -1,6 +1,20 @@
 {
-  "nextId": 6,
+  "nextId": 7,
   "posts": [
+    {
+      "id": 6,
+      "title": "테스트입니다.",
+      "category": "맛집탐방",
+      "content": "테스트",
+      "excerpt": "테스트",
+      "author": "익명",
+      "createdAt": "2026-07-16T01:06:49.410Z",
+      "likes": 0,
+      "views": 2,
+      "tags": [
+        "테스트"
+      ]
+    },
     {
       "id": 5,
       "title": "강남 맛집추천",
@@ -9,8 +23,8 @@
       "excerpt": "멀티캠퍼스 20층 맛집입니다.",
       "author": "익명",
       "createdAt": "2026-07-15T08:49:07.697Z",
-      "likes": 2,
-      "views": 2,
+      "likes": 3,
+      "views": 4,
       "tags": [
         "맛집"
       ]
@@ -39,7 +53,7 @@
       "author": "익명 89",
       "createdAt": "2026-07-15T09:20:00.000Z",
       "likes": 7,
-      "views": 85,
+      "views": 87,
       "tags": [
         "러닝",
         "야간"
@@ -53,8 +67,8 @@
       "excerpt": "푸드트럭 라인업 떴네요! 금토일 18시부터 한다고 하니 가실 분들 참고하세요.",
       "author": "익명 412",
       "createdAt": "2026-07-15T08:10:00.000Z",
-      "likes": 91,
-      "views": 235,
+      "likes": 93,
+      "views": 245,
       "tags": [
         "야시장",
         "축제"
@@ -69,7 +83,7 @@
       "author": "익명 78",
       "createdAt": "2026-07-14T22:05:00.000Z",
       "likes": 56,
-      "views": 164,
+      "views": 165,
       "tags": [
         "가을",
         "나들이"
