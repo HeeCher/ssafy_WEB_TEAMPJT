@@ -70,10 +70,14 @@ async function loadSpot() {
   `);
 
   renderList(stationList, spot.nearbyStations, station => `
-    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+    <a href="${station.naverLink || `https://search.naver.com/search.naver?query=${encodeURIComponent(station.name)}`}"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="group block rounded-3xl border border-slate-200 bg-slate-50 p-5 transition hover:border-primary hover:bg-white">
       <h3 class="font-semibold text-slate-900">${station.name}</h3>
       <p class="text-slate-500 text-sm">${station.line} · ${station.distance}</p>
-    </div>
+      <p class="mt-3 text-xs text-slate-400 group-hover:text-primary">네이버에서 보기</p>
+    </a>
   `);
 
   const restaurantTypes = [
@@ -98,10 +102,10 @@ async function loadSpot() {
   ];
 
   const restaurantSearchItems = restaurantTypes.map(type => {
-    const keyword = `${spot.address} 주변 ${type.query}`;
+    const keyword = `${spot.title} 주변 ${type.query}`;
     return {
       name: type.label,
-      desc: `${spot.address} 주변 ${type.query} 맛집 검색`,
+      desc: `${spot.title} 주변 ${type.query} 맛집 검색`,
       photo: type.photo,
       naverLink: `https://search.naver.com/search.naver?query=${encodeURIComponent(keyword)}`
     };

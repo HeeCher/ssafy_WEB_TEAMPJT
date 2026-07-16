@@ -114,6 +114,41 @@ function weatherDescription(code) {
   return map[code] || '맑음';
 }
 
+function toRadians(deg) {
+  return (deg * Math.PI) / 180;
+}
+
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+const subwayStations = [
+  { name: '서울역', line: '1호선', lat: 37.5547, lon: 126.9707 },
+  { name: '시청역', line: '1호선', lat: 37.5655, lon: 126.9769 },
+  { name: '홍대입구역', line: '2호선', lat: 37.5579, lon: 126.9250 },
+  { name: '강남역', line: '2호선', lat: 37.4979, lon: 127.0276 },
+  { name: '건대입구역', line: '2/7호선', lat: 37.5401, lon: 127.0703 },
+  { name: '성수역', line: '2호선', lat: 37.5440, lon: 127.0554 },
+  { name: '뚝섬역', line: '2호선', lat: 37.5483, lon: 127.0465 },
+  { name: '강동역', line: '5호선', lat: 37.5306, lon: 127.1230 },
+  { name: '둔촌오륜역', line: '5호선', lat: 37.5387, lon: 127.1495 },
+  { name: '잠실역', line: '2호선', lat: 37.5131, lon: 127.1008 },
+  { name: '서울숲역', line: '2호선', lat: 37.5448, lon: 127.0420 },
+  { name: '종각역', line: '1호선', lat: 37.5704, lon: 126.9820 },
+  { name: '안국역', line: '3호선', lat: 37.5775, lon: 126.9859 },
+  { name: '종로3가역', line: '1/3/5호선', lat: 37.5715, lon: 126.9915 },
+  { name: '동대문역사문화공원역', line: '2/4/5호선', lat: 37.5654, lon: 127.0091 }
+];
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'assets')));
 app.use(express.static(path.join(__dirname, '.')));
@@ -229,80 +264,48 @@ app.get('/api/seoul-spots/:id', async (req, res) => {
     return res.status(404).json({ error: '스팟을 찾을 수 없습니다.' });
   }
 
-  const photos = [spot.firstimage, spot.firstimage2, spot.firstimage]
+  const photos = [spot.firstimage, spot.firstimage2, spot.firstimage3]
     .filter(Boolean)
     .slice(0, 3);
 
-  while (photos.length < 3) {
-    photos.push(photos[0] || 'https://via.placeholder.com/800x500?text=No+Image');
-  }
+  const spotLat = parseFloat(spot.mapy);
+  const spotLon = parseFloat(spot.mapx);
 
-  const locationInfo = [
-    {
-      key: '강동구',
-      stations: [
-        { name: '둔촌오륜역', line: '5호선', distance: '1.1km' },
-        { name: '강동역', line: '5호선', distance: '1.4km' }
-      ],
-      restaurants: [
-  {
-    name: '둔촌역 감자탕',
-    desc: '든든한 한식 국물 맛집',
-    photo: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-    naverLink: 'https://search.naver.com/search.naver?query=둔촌역+감자탕',
-    reviews: '3,200'
-  },
-  {
-    name: '강동역 카페 75',
-    desc: '브런치와 디저트 추천',
-    photo: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=80',
-    naverLink: 'https://search.naver.com/search.naver?query=강동역+카페+75',
-    reviews: '2,100'
-  },
-  {
-    name: '둔촌역 분식',
+  const nearbyStations = !Number.isNaN(spotLat) && !Number.isNaN(spotLon)
+    ? subwayStations
+        .map(station => {
+          const distanceKm = getDistanceKm(spotLat, spotLon, station.lat, station.lon);
+          return {
+            name: station.name,
+            line: station.line,
+            distance: distanceKm < 1
+              ? `${Math.round(distanceKm * 1000)}m`
+              : `${distanceKm.toFixed(1)}km`,
+            naverLink: `https://search.naver.com/search.naver?query=${encodeURIComponent(station.name)}`
+          };
+        })
+        .sort((a, b) => {
+          const aDist = parseFloat(a.distance);
+          const bDist = parseFloat(b.distance);
+          return aDist - bDist;
+        })
+        .slice(0, 2)
+    : [
+        {
+          name: '서울역',
+          line: '1호선',
+          distance: '2.0km',
+          naverLink: 'https://search.naver.com/search.naver?query=서울역'
+        }
+      ];
+
+  const nearbyRestaurants = nearbyStations.map(station => ({
+    name: station.name,
     desc: '가성비 떡볶이 전문점',
     photo: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=800&q=80',
     naverLink: 'https://search.naver.com/search.naver?query=둔촌역+분식',
     reviews: '1,870'
-  }
-]
-    },
-    {
-      key: '종로구',
-      stations: [
-        { name: '종각역', line: '1호선', distance: '900m' },
-        { name: '안국역', line: '3호선', distance: '1.3km' }
-      ],
-      restaurants: [
-        { name: '종각 떡볶이', desc: '매콤달콤 즉석 떡볶이' },
-        { name: '광화문 김밥', desc: '간편하고 인기 많은 분식집' },
-        { name: '인사동 찻집', desc: '전통 다과와 분위기 좋은 카페' }
-      ]
-    },
-    {
-      key: '성동구',
-      stations: [
-        { name: '뚝섬역', line: '2호선', distance: '750m' },
-        { name: '성수역', line: '2호선', distance: '1.8km' }
-      ],
-      restaurants: [
-        { name: '뚝섬 파스타', desc: '데이트하기 좋은 이탈리안' },
-        { name: '서울숲 분식', desc: '가볍게 즐기는 한끼' },
-        { name: '카페 포레스트', desc: '도심 속 힐링 카페' }
-      ]
-    }
-  ];
-
-  const matched = locationInfo.find(item => spot.addr1.includes(item.key));
-  const nearbyStations = matched?.stations || [
-    { name: '서울역', line: '1호선', distance: '2.0km' }
-  ];
-  const nearbyRestaurants = matched?.restaurants || [
-    { name: '서울 맛집 A', desc: '대표 추천 맛집입니다.' },
-    { name: '서울 맛집 B', desc: '인기 메뉴를 경험해보세요.' },
-    { name: '서울 맛집 C', desc: '가볍게 들르기 좋은 식당.' }
-  ];
+  }));
 
   res.json({
     id: spot.contentid,
